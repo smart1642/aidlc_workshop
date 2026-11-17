@@ -1,0 +1,8 @@
+# 줄바꿈 통일 (Windows / macOS 혼용 대비)
+* text=auto eol=lf
+*.ps1 text eol=crlf
+*.cmd text eol=crlf
+*.bat text eol=crlf
+
+# AI-DLC 감사 로그: 여러 브랜치가 끝에 추가만 하므로 로컬 merge 시 양쪽 내용 모두 유지
+aidlc-docs/audit.md merge=union

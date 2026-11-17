@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [develop, main]
+  push:
+    branches: [develop, main]
+
+permissions:
+  contents: read
+
+jobs:
+  branch-rule:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check branch name and PR target
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          echo "PR: ${HEAD_REF} -> ${BASE_REF}"
+          name_re='^(inception|feature|fix|docs|chore|hotfix)/[a-z0-9][a-z0-9-]*$'
+
+          if [ "$BASE_REF" = "main" ]; then
+            if [ "$HEAD_REF" = "develop" ] || [[ "$HEAD_REF" =~ ^hotfix/[a-z0-9][a-z0-9-]*$ ]]; then
+              echo "OK"; exit 0
+            fi
+            echo "::error::main 으로는 develop 또는 hotfix/* 만 PR 할 수 있습니다."
+            exit 1
+          fi
+
+          if [ "$BASE_REF" = "develop" ]; then
+            if [ "$HEAD_REF" = "main" ]; then
+              echo "OK (hotfix 반영)"; exit 0
+            fi
+            if [[ "$HEAD_REF" =~ ^hotfix/ ]]; then
+              echo "::error::hotfix/* 는 main 으로 PR 후, main -> develop 으로 반영하세요."
+              exit 1
+            fi
+            if [[ "$HEAD_REF" =~ $name_re ]]; then
+              echo "OK"; exit 0
+            fi
+            echo "::error::브랜치 이름 규칙 위반: <inception|feature|fix|docs|chore>/<영문소문자-kebab> (CONTRIBUTING.md 1장)"
+            exit 1
+          fi
+
+  markdown-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DavidAnson/markdownlint-cli2-action@v16
+        with:
+          globs: |
+            *.md
+            docs/**/*.md
+            .github/**/*.md
+
+  # 기술 스택 확정 후 빌드/테스트 단계로 교체 (docs/aidlc-team-workflow.md 6장)
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Placeholder
+        run: echo "기술 스택 확정 후 빌드/테스트 단계를 추가하세요."

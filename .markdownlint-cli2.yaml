@@ -1,0 +1,15 @@
+# 팀 문서만 검사 (AI-DLC 생성 산출물은 제외)
+config:
+  default: true
+  MD013: false # 줄 길이 제한 없음
+  MD033: false # HTML 허용
+  MD041: false # 첫 줄 제목 강제 안 함
+  MD024:
+    siblings_only: true
+  MD036: false # 강조 텍스트 허용
+  MD060: false # 표 정렬 스타일 강제 안 함
+ignores:
+  - "aidlc-docs/**"
+  - "proposals/**"
+  - ".kiro/**"
+  - "node_modules/**"
